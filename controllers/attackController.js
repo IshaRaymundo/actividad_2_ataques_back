@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const db = require("../models/database");
 
 const attackController = {
-  // CSRF: Transferencia sin validación
   transfer: (req, res) => {
     const { amount, toAccount } = req.body;
     const query = `INSERT INTO transfers (amount, toAccount) VALUES ('${amount}', '${toAccount}')`;
@@ -17,7 +16,6 @@ const attackController = {
     });
   },
 
-  // JWT: No verifica firma del token JWT, pero valida el rol
   adminArea: (req, res) => {
     const token = req.headers.authorization?.split(" ")[1] || "";
     const decoded = jwt.decode(token);
@@ -79,12 +77,13 @@ const attackController = {
   },
 
   getAllComments: (req, res) => {
-    const query = "SELECT * FROM comments";
-    const user_id = req.body.user_id
-    if (req.query.user_id) {
+    let query = "SELECT * FROM comments";
+    const user_id = req.query.user_id; 
+  
+    if (user_id) {
       query += ` WHERE user_id = ${user_id}`;
     }
-
+  
     db.all(query, (err, results) => {
       if (err) return res.status(500).send(err);
       res.json({
@@ -94,6 +93,7 @@ const attackController = {
       });
     });
   },
+  
 };
 
 module.exports = attackController;
